@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { InputBox } from "./components";
+import { useState, useEffect } from "react";
+import InputBox from "./components/InputBox";
 import useCurrencyInfo from "./hooks/useCurrencyInfo";
 
 function App() {
@@ -13,15 +13,22 @@ function App() {
   const options = Object.keys(currencyInfo);
 
   const swap = () => {
+    const temp = from;
     setFrom(to);
-    setTo(from);
-    setConvertedAmount(amount);
-    setAmount(convertedAmount);
+    setTo(temp);
+    convert(); // Recalculate after swapping
   };
 
   const convert = () => {
     setConvertedAmount(amount * currencyInfo[to]);
   };
+
+  // Automatically trigger conversion when amount, from, or to changes
+  useEffect(() => {
+    if (amount && currencyInfo[to]) {
+      convert();
+    }
+  }, [amount, from, to, currencyInfo]);
 
   return (
     <div
@@ -43,7 +50,7 @@ function App() {
                 label="From"
                 amount={amount}
                 currencyOptions={options}
-                onCurrencyChange={(currency) => setAmount(amount)}
+                onCurrencyChange={(currency) => setFrom(currency)} // Fix here
                 selectCurrency={from}
                 onAmountChange={(amount) => setAmount(amount)}
               />
@@ -63,7 +70,7 @@ function App() {
                 amount={convertedAmount}
                 currencyOptions={options}
                 onCurrencyChange={(currency) => setTo(currency)}
-                selectCurrency={from}
+                selectCurrency={to} // Fix here
                 amountDisable
               />
             </div>
