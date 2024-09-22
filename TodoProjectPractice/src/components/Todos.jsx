@@ -1,46 +1,44 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { updateTodo, removeTodo, toggleTodo } from "../features/todoSlice";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteTodo, completeTodo, editTodo } from "../features/todoSlice";
 
 function Todos() {
-  const todos = useSelector((state) => state.todos); // Accessing the todos from the store
+  const todos = useSelector((state) => state.todos.todos);
   const dispatch = useDispatch();
 
+  
+
   return (
-    <div className="flex justify-center items-center">
+    <>
       <ul className="list-none">
         {todos.map((todo) => (
           <li
-            className="mt-4 flex justify-between items-center bg-zinc-800 px-4 py-2 rounded"
             key={todo.id}
+            className={`mt-4 flex justify-between items-center gap-2 bg-zinc-800 px-4 py-2 rounded transition-colors duration-200 ease-in-out ${
+              todo.completed === true ? "bg-red-800" : "bg-zinc-800"
+            }`}
           >
-            {/* Checkbox to toggle completion */}
             <input
               type="checkbox"
-              checked={todo.completed} // This is based on the todo's completion status
-              onChange={() => dispatch(toggleTodo(todo.id))} // Dispatching toggleTodo on change
-              className="w-4 h-4 cursor-pointer"
+              onChange={() => dispatch(completeTodo(todo.id))}
             />
-
-            <div className="w-3"></div>
-
-            {/* Todo text field */}
             <input
               type="text"
-              className="w-full bg-zinc-800 text-white"
+              className={`text-white text-left p-1 w-[60vw] ${
+                todo.completed
+                  ? "bg-red-700 text-black line-through border-black/10"
+                  : "bg-zinc-800"
+              }`}
               value={todo.text}
               onChange={(e) =>
-                dispatch(updateTodo({ id: todo.id, text: e.target.value }))
+                dispatch(editTodo({ id: todo.id, text: e.target.value }))
               }
-              placeholder="Enter a Todo..."
+              readOnly={todo.completed}
             />
 
-            <div className="w-3"></div>
-
-            {/* Delete button */}
             <button
-              onClick={() => dispatch(removeTodo(todo.id))}
-              className="text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"
+              onClick={() => dispatch(deleteTodo(todo.id))}
+              className="text-white bg-red-700 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +58,7 @@ function Todos() {
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 }
 
